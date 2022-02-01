@@ -1,21 +1,40 @@
-.data
-msg:
-    .ascii "Hello, ARM64!\n"
+/*
+     Expression
+                     d
+     a ⋅ e - b ⋅ c + ─
+                     b
+     ─────────────────
+       (b + c) ⋅ a
 
-len = . - msg
+     where variable sizes are:
+     a - 16,
+     b - 16,
+     c - 32,
+     d - 16,
+     e - 32.
 
-.text
+     Variables are unsigned.
 
-.globl _start
-_start:
-    /* syscall write(int fd, const void *bf, size_t count) */
-    mov x0, #1 /* fd := STDOUT_FILENO */
-    ldr x1, =msg /* buf := msg */
-    ldr x2, =len /* count := len */
-    mov w8, #64  /* write is syscall #64 */
-    svc #0 /* invoke syscall */
+     Alignment: chaotic neutral^W^W
+     first two columns 8 chars wide,
+     third column is 16 wide, last - 48
+*/
 
-    /* syscall exit(int status) */
-    mov x0, #0 /* status := 0 */
-    mov w8, #93 /* exit is syscall #1 */
-    svc #0 /* invoke syscall */
+        .section .rodata
+mesg: 	.asciz   "Hello World\n"
+
+	.text
+	.global main
+
+main: 	stp	x29, x30, [sp, #-16]!
+
+	// printf("Hello World!\n")
+	adr	x0, mesg
+	bl printf
+
+	// return 0
+	mov 	w0, #0
+	ldp	x29, x30, [sp], #16
+	ret
+	
+	.size	main,(. - main)
