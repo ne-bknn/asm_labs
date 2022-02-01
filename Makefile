@@ -1,5 +1,5 @@
-CC=aarch64-linux-gnu-as
-LD=aarch64-linux-gnu-ld
+CC       := aarch64-linux-gnu-as
+LD       := aarch64-linux-gnu-ld
 CUR_PATH := $(shell pwd)
 BASENAME := $(shell basename $(CUR_PATH))
 
@@ -9,18 +9,22 @@ default: build
 .PHONY: build
 build: *.s
 	$(CC) -g -o $(BASENAME).o $^
-	$(LD) -s -g -o $(BASENAME).out $(BASENAME).o 
+	$(LD) -s -static -g -o $(BASENAME).out $(BASENAME).o 
+
+.PHONY: abuild # alternative building, use it when using libc functions
+abuild: *.s
+	aarch64-linux-gnu-gcc -g -static -o $(BASENAME).out $^
 
 .PHONY: run
-run: build
+run: $(BASENAME).out
 	qemu-aarch64 $(BASENAME).out
 
 .PHONY: clean
-clean: $(BASENAME).out $(BASENAME).o
-	-@rm $^ || true &> /dev/null
+clean:
+	-rm *.out *.o &> /dev/null || true
 
 .PHONY: debug
-debug: build
+debug: $(BASENAME).out
 	$(eval TMP := $(shell mktemp /tmp/gdb-config.XXXXXX))
 	echo -e "set architecture aarch64\nfile $(BASENAME).out\ntarget remote localhost:31337" > $(TMP)
 	tmux new-session -d 'qemu-aarch64 -g 31337 $(BASENAME).out && $$SHELL'
