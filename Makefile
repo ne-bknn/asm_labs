@@ -1,4 +1,5 @@
-CC       := aarch64-linux-gnu-as
+CC       := aarch64-linux-gnu-gcc
+AS       := aarch64-linux-gnu-as
 LD       := aarch64-linux-gnu-ld
 CUR_PATH := $(shell pwd)
 BASENAME := $(shell basename $(CUR_PATH))
@@ -8,16 +9,16 @@ default: build
 
 .PHONY: build
 build: *.s
-	$(CC) -g -o $(BASENAME).o $^
+	$(AS) -g -o $(BASENAME).o $^
 	$(LD) -s -static -g -o $(BASENAME).out $(BASENAME).o 
 
 .PHONY: abuild # alternative building, use it when using libc functions
 abuild: *.s
-	aarch64-linux-gnu-gcc -g -static -o $(BASENAME).out $^
+	$(CC) -g -static -o $(BASENAME).out $^
 
 .PHONY: run
 run: $(BASENAME).out
-	qemu-aarch64 $(BASENAME).out
+	qemu-aarch64 -L /usr/aarch64-linux-gnu $(BASENAME).out
 
 .PHONY: clean
 clean:
