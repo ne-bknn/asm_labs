@@ -7,18 +7,32 @@ BASENAME := $(shell basename $(CUR_PATH))
 .PHONY: default
 default: build
 
-.PHONY: build
-build: *.s
-	$(AS) -g -o $(BASENAME).o $^
-	$(LD) -s -static -g -o $(BASENAME).out $(BASENAME).o 
+SRCS = $(wildcard *.s)
 
-.PHONY: abuild # alternative building, use it when using libc functions
-abuild: *.s
-	$(CC) -g -static -o $(BASENAME).out $^
+PROGS = $(patsubst %.s,%,$(SRCS))
+
+.PHONY: all 
+all: $(PROGS)
+
+%: %.s 
+	$(AS) -g -o $@.o $<
+	$(LD) -s -static -L /usr/aarch64-linux-gnu/ -lc -g -o $@.out $@.o 
+	rm *.o
+
+
+.PHONY: build
+build: main.s
+	$(AS) -g -o $(BASENAME).o $^
+	$(LD) -L /usr/aarch64-linux-gnu/ -lc -g -o $(BASENAME).out $(BASENAME).o 
+	-@rm $(BASENAME).o
+
+.PHONY: abuild
+abuild: main.s 
+	$(CC) -g -L /usr/aarch64-linux-gnu -lc -g -o $(BASENAME).out main.s
 
 .PHONY: run
 run: $(BASENAME).out
-	qemu-aarch64 -L /usr/aarch64-linux-gnu $(BASENAME).out
+	qemu-aarch64 -L /usr/aarch64-linux-gnu $(BASENAME).out t1
 
 .PHONY: clean
 clean:
@@ -28,7 +42,10 @@ clean:
 debug: $(BASENAME).out
 	$(eval TMP := $(shell mktemp /tmp/gdb-config.XXXXXX))
 	echo -e "set architecture aarch64\nfile $(BASENAME).out\ntarget remote localhost:31337" > $(TMP)
-	tmux new-session -d 'qemu-aarch64 -g 31337 $(BASENAME).out && $$SHELL'
+	tmux new-session -d 'qemu-aarch64 -L /usr/aarch64-linux-gnu -g 31337 $(BASENAME).out output; $$SHELL'
 	tmux split-window -h 'gdb-multiarch -x $(TMP)'
+	tmux select-pane -t 0
+	tmux split-window -v -p 75 'vim main.s'
 	-tmux -2 attach-session -d
-	-rm $(TMP) && pkill -9 qemu
+	-rm $(TMP) && pkill qemu && sleep 0.1 && pkill -9 qemu
+	-rm *.core
