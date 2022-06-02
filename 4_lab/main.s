@@ -181,10 +181,12 @@ _start:
   _validate_argc:
         cmp     w0, #2
         bne    argc_err
-        ldr     x0, [sp, #8] // x0 - argv[0]
+        ldr     x0, [sp, #16] // x0 - argv[1]
   _open_file:
+        stp     x29, x30, [sp, #-16]!
         adr     x1, read_mode
         bl      fopen
+        ldp     x29, x30, [sp], #16
         mov     x20, x0 // x20 - FILE*
         cbz     x0, open_err
   _read_matrices:
