@@ -37,6 +37,7 @@ def solve():
     res = np.subtract(left, LargeProduct)
     print(res)
 
+
 if __name__ == "__main__":
     solve()
 

@@ -14,39 +14,14 @@ main:
     mov x4, #-16
     mov x5, #-20
     mov x6, #-150
+    fmov s1, #0.5
 
-    stp x9, x10, [sp, #-16]!
-    stp x7, x8, [sp, #-16]!
-    stp x5, x6, [sp, #-16]!
-    stp x3, x4, [sp, #-16]!
-    stp x1, x2, [sp, #-16]!
+    cbz x0, exit
 
-    // x0 - current max, x1, x2 - current elements, x4 - counter
+    // x0 - max, x4 - counter 
     mov x4, x0
     mov x0, x1
-    
-    b loop_check
-loop_body:
-    ldp x1, x2, [sp], #16
-    cmp x1, x0
-    ble else_label_1
-    mov x0, x1
-else_label_1:
-    cmp x2, x0
-    ble else_label_2
-    mov x0, x2
-else_label_2:
-    sub x4, x4, #2
-loop_check:
-    cmp x4, #2
-    bge loop_body
 
-    cmp x4, #1
-    bne exit
-    ldr x1, [sp]
-    cmp x1, x0
-    ble exit
-    mov x0, x1
 exit:
 output:
     mov x1, x0

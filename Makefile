@@ -32,7 +32,7 @@ abuild: main.s
 
 .PHONY: run
 run: $(BASENAME).out
-	qemu-aarch64 -L /usr/aarch64-linux-gnu $(BASENAME).out t2
+	qemu-aarch64 -L /usr/aarch64-linux-gnu $(BASENAME).out t11
 
 .PHONY: clean
 clean:
@@ -42,7 +42,7 @@ clean:
 debug: $(BASENAME).out
 	$(eval TMP := $(shell mktemp /tmp/gdb-config.XXXXXX))
 	echo -e "set architecture aarch64\nfile $(BASENAME).out\ntarget remote localhost:31337" > $(TMP)
-	tmux new-session -d 'qemu-aarch64 -L /usr/aarch64-linux-gnu -g 31337 $(BASENAME).out t2; $$SHELL'
+	tmux new-session -d 'qemu-aarch64 -L /usr/aarch64-linux-gnu -g 31337 $(BASENAME).out t5; $$SHELL'
 	tmux split-window -h 'gdb-multiarch -x $(TMP)'
 	tmux select-pane -t 0
 	tmux split-window -v -p 75 'vim main.s'

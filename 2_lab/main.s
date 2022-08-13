@@ -3,10 +3,10 @@
     .align 3
 
 rows:
-    .byte 4
+    .byte 3
 columns:
     .byte 3
-    .set nnums, 12
+    .set nnums, 9
 
 
 fmt_out:
@@ -18,17 +18,15 @@ fmt_new:
 
 in_matrix:
   
-  .2byte -5, -4, -3 // -12
+  .2byte -5, 8, -2 // 1
   
-  .2byte 9, -1, 8 // 16
+  .2byte -2, -3, -8 // -13
   
-  .2byte 6, -2, 6 // 10
-  
-  .2byte 2, 1, -5 // -2
+  .2byte 2, 7, 0 // 9
   
 
 out_matrix:
-    .skip 24
+    .skip 18
 
 
 indecies:
@@ -223,14 +221,13 @@ output_loop_body:
   add   x26, x26, #1
 output_loop_check:
   cmp   x26, x25
-  bge _exit
+  bge my_exit
   b output_loop_body
 
 
-_exit:
+my_exit:
   adr x0, fmt_new
   bl printf
   mov x0, #0
-  mov x8, #93
-  svc #0
+  bl exit
   .size _start, .-_start

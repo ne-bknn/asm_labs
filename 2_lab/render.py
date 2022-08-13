@@ -13,7 +13,7 @@ str_matrix = [", ".join([str(c) for c in e]) for e in random_matrix]
 sums = [sum(e) for e in random_matrix]
 res = zip(str_matrix, sums)
 
-output = template.render(n_rows=n_rows, n_columns=n_columns, numbers=res)
+output = template.render(n_rows=n_rows, n_columns=n_columns, numbers=res, indecies=indecies, sums=sums_t)
 
 with open("main.s", "w") as f:
     f.write(output)

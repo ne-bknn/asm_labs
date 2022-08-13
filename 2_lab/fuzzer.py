@@ -68,9 +68,17 @@ def main():
     source = render_source(matrix)
     binary = compile(source)
     binary_answer = run_binary(binary)
-    print(answer)
-    print(binary_answer)
+    if answer.strip() != binary_answer.strip():
+        print(matrix)
+        print("=======")
+        print(answer)
+        print(binary_answer)
+        input()
 
 
 if __name__ == "__main__":
-    main()
+    i = 0
+    while True:
+        main()
+        print(f"ok {str(i).zfill(10)}")
+        i += 1

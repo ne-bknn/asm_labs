@@ -1,7 +1,7 @@
 /*
 
     Function:
-      A^2-B^2-(A+B)*(A-B)
+      A^2-B^2-(A+B)*(A-B) = AB - BA
     Input: n
            <n lines 1 matrix>
            <n lines 2 matrix>
@@ -29,10 +29,10 @@ fmt_newline:
     .asciz "\n"
 
 fmt_read_double:
-    .asciz " %lf "
+    .asciz "%lf"
 
 fmt_read_int:
-    .asciz " %d "
+    .asciz "%d"
 
 read_mode:
     .asciz "r"
@@ -47,8 +47,14 @@ error_filename:
 error_argc_label:
 		.asciz		"Usage: ./3_lab.out <filename>\n"
 
+unexpected_end_err:
+    .asciz    "Unexpected end of file\n"
+
 fmt_open_file_err:
         .asciz		"Error opening file\n"
+
+invalid_n_label: 
+        .asciz    "0 < n <= 20"
 
 
 
@@ -63,11 +69,13 @@ argc_err:
 		adr 		x1, error_argc_label
 		bl          output
 		mov 		w0, #1
-        bl          _exit
+        bl          exit
 
 my_exit:
+        //mov     x0, #0
+        //bl      fflush
         mov 		x0, #0
-        bl          _exit
+        bl          exit
 
 // void matrix_multiply(double * matrix_1, double *matrix_2, double *matrix_out, unsigned n) {
 matrix_multiply:
@@ -165,6 +173,8 @@ matrix_read:
         mov     x1, x21
         mov     x2, x20
         bl      fscanf
+        cmp     w0, #0
+        ble     unexpected_end
         add     x20, x20, #8 // matrix_1 = matrix_1 + 8
         subs    x22, x22, #1 // n--
         bne     matrix_read_body
@@ -195,8 +205,14 @@ _start:
         adr     x1, fmt_read_int
         bl      fscanf
         adr     x2, n
+
         ldr     w1, [x2]
         mov     w21, w1 // w21 - n
+
+        cmp     w21, 20
+        bgt     invalid_n
+        cmp     w21, 0
+        ble     invalid_n
 
         adr     x0, matrix_A
         mov     x2, x20
@@ -227,14 +243,26 @@ _start:
         .size   _start, .-_start
 
 output:
+        stp     x29, x30, [sp, #-16]!
         adr     x0, fmt_asciz
         bl      printf
+        ldp     x29, x30, [sp], #16
         ret
 
+unexpected_end:
+        adr   x1, unexpected_end_err
+        bl    output
+        mov   x0, #1 
+        bl exit
 
+invalid_n:
+        adr   x1, invalid_n_label
+        bl    output
+        mov   x0, #1 
+        bl exit
 
 open_err:
         adr    x1, fmt_open_file_err
         bl     output
         mov    x0, #1
-        bl     _exit
+        bl     exit

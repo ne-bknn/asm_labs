@@ -3,10 +3,10 @@
     .align 3
 
 rows:
-    .byte {{ n_rows }}
+    .byte 4
 columns:
-    .byte {{ n_columns }}
-    .set nnums, {{ n_rows*n_columns }}
+    .byte 6
+    .set nnums, 24
 
 
 fmt_out:
@@ -17,21 +17,27 @@ fmt_new:
 
 
 in_matrix:
-  {% for item, s in numbers %}
-  .2byte {{ item }} // {{ s }}
-  {% endfor %}
+  
+  .2byte 7, -2, -2, 7, 8, -9 // 9
+  
+  .2byte -3, 7, 2, 1, 5, -4 // 8
+  
+  .2byte -2, 2, -8, 5, -1, 6 // 2
+  
+  .2byte 9, -4, -3, 1, 2, -3 // 2
+  
 
 out_matrix:
-    .skip {{ n_rows*n_columns*2 }}
+    .skip 48
 
 
 indecies:
-    .4byte {{ indecies }}  // keeping them 4 byte makes address calculation a bit simpler
+    .4byte 0, 1, 2, 3  // keeping them 4 byte makes address calculation a bit simpler
 
 
     .p2align 2
 sums:
-    .4byte {{ sums }}
+    .4byte 0, 0, 0, 0
 
 
     .text
@@ -227,4 +233,3 @@ my_exit:
   mov x0, #0
   bl exit
   .size _start, .-_start
-

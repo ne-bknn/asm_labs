@@ -2,3 +2,7 @@ training
 tags
 *.o
 *.out
+core*
+.ccls-cache/
+*.core
+*.in

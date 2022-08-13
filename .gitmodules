@@ -1,0 +1,3 @@
+[submodule "5_lab/stb"]
+	path = 5_lab/stb
+	url = https://github.com/nothings/stb
